@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	prompt "github.com/c-bata/go-prompt"
-	"github.com/ktr0731/evans/adapter/gateway"
+	"github.com/kazu/evans/adapter/gateway"
 	"github.com/ktr0731/evans/config"
 	"github.com/ktr0731/evans/entity"
 	"github.com/ktr0731/evans/usecase/port"

@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
+	"os"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -14,6 +17,8 @@ import (
 	"github.com/ktr0731/evans/entity"
 	multierror "github.com/ktr0731/go-multierror"
 	"github.com/pkg/errors"
+
+	kcp "github.com/xtaci/kcp-go"
 )
 
 type GRPCClient struct {
@@ -25,7 +30,15 @@ type GRPCClient struct {
 
 func NewGRPCClient(config *config.Config) (*GRPCClient, error) {
 	// TODO: secure option
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port), grpc.WithInsecure())
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	if useKCP := os.Getenv("GRPC_KCP"); useKCP == "1" {
+		fmt.Printf("use kcp!!!\n")
+		opts = append(opts, grpc.WithDialer(func(s string, t time.Duration) (net.Conn, error) {
+			return kcp.DialWithOptions(s, nil, 10, 3)
+		}))
+	}
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port), opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to dial to gRPC server")
 	}

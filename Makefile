@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-VERSION := $(shell bump show meta/meta.go)
+VERSION := "1" #$(shell bump show meta/meta.go)
 
 .PHONY: version
 version:
